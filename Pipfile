@@ -11,6 +11,9 @@ pandas = "*"
 catboost = "*"
 scikit-learn = "==1.6.1"
 xgboost = "*"
+openai = "*"
+pyrefly = "*"
+icecream = "*"
 
 [dev-packages]
 

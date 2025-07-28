@@ -1,23 +1,13 @@
-from typing import Literal
+from fastapi.datastructures import UploadFile
+from typing import Annotated
+from api.use_cases.price_uc import validate_laptop_name
 from fastapi import APIRouter, Request
-from pydantic import BaseModel, Field
 import pandas as pd
+from api.contracts.price_contracts import PredictPriceRequest
+from api.use_cases.price_uc import preprocess_request
+from fastapi import File, Form
 
 router = APIRouter(prefix="/models", tags=["Models"])
-
-class PredictPriceRequest(BaseModel):
-    Status: Literal["New", "Refurbished"]
-    Brand: str
-    Model: str
-    CPU: str
-    RAM: int
-    Storage: int
-    Storage_type: Literal["eMMC", "SSD"]
-    GPU: str
-    Screen: float
-    Touch: Literal["Yes", "No"]
-
-
 
 
 @router.post("/price")  
@@ -25,10 +15,18 @@ async def predict_price(
     body: PredictPriceRequest,
     request: Request,
 ):
-    data = body.model_dump()
-    data["Storage type"] = data.pop("Storage_type")
-    df_input = pd.DataFrame([data])
+    df_input = await preprocess_request(body)
     price_model = request.app.state.models["price_model"]
     pred = price_model.predict(df_input)[0]
 
     return {"predicted_price_mxn": round(float(pred), 2)}
+
+@router.post("/validate-laptop")
+async def validate_laptop(
+    request: Request,
+    image: UploadFile = File(...),
+    brand: str = Form(...),
+    model: str = Form(...),
+):
+    await validate_laptop_name(image, brand, model)
+    return {"detail": "La imagen es válida."}
