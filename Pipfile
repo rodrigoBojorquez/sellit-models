@@ -7,6 +7,10 @@ name = "pypi"
 fastapi = {extras = ["standard"], version = "*"}
 joblib = "*"
 python-dotenv = "*"
+pandas = "*"
+catboost = "*"
+scikit-learn = "==1.6.1"
+xgboost = "*"
 
 [dev-packages]
 
