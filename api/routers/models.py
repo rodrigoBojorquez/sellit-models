@@ -6,6 +6,7 @@ import pandas as pd
 from api.contracts.price_contracts import PredictRequest
 from api.use_cases.price_uc import preprocess_request
 from fastapi import File, Form
+from api.use_cases.recommendation_uc import recommend_laptop
 
 router = APIRouter(prefix="/models", tags=["Models"])
 
@@ -40,9 +41,7 @@ async def predict_gama(body: PredictRequest, request: Request):
         "gama_code": int(pred),
         "gama_label": mapping[int(pred)]
     }
-
-    return {"predicted_gama": round(float(pred), 2)}
-
+    
 @router.post("/priceperformance")
 async def predict_priceperformance(body: PredictRequest, request: Request):
     df_input = await preprocess_request(body)
@@ -52,3 +51,8 @@ async def predict_priceperformance(body: PredictRequest, request: Request):
     mapping = {0: "no", 1: "yes"}
 
     return {"predicted_priceperformance": round(float(pred), 2), "priceperformance_label": mapping[int(pred)]}
+
+@router.post("/recommendation")
+async def recommend_laptop(prompt: str, request: Request):
+    pred = await recommend_laptop(prompt)
+    return {"recommendation": pred}
