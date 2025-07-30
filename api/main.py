@@ -1,6 +1,7 @@
 from fastapi.responses import JSONResponse
 from dotenv.main import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import joblib
 from api.routers.models import router as models_router
@@ -33,6 +34,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.exception_handler(Error)
 async def error_handler(request: Request, exc: Error):
