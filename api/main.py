@@ -7,6 +7,7 @@ from api.routers.models import router as models_router
 from pathlib import Path
 from fastapi import Request
 from api.common import Error, ValidationError, NotFoundError, ConflictError
+from fastapi.middleware.cors import CORSMiddleware
 
 BASE_DIR = Path(__file__).parent
 ERROR_STATUS_MAP = {
@@ -33,6 +34,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for CORS
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.exception_handler(Error)
 async def error_handler(request: Request, exc: Error):
